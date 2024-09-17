@@ -1,13 +1,19 @@
 package com.codigofacilito.peliculas.controllers;
 
+import com.codigofacilito.peliculas.entities.Actor;
 import com.codigofacilito.peliculas.entities.Pelicula;
+import com.codigofacilito.peliculas.services.IActorService;
 import com.codigofacilito.peliculas.services.IGeneroService;
 import com.codigofacilito.peliculas.services.IPeliculaService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Controller
 public class PeliculasController {
@@ -15,9 +21,12 @@ public class PeliculasController {
     private IPeliculaService peliculaService;
     private IGeneroService generoService;
 
-    public PeliculasController(IPeliculaService peliculaService, IGeneroService generoService) {
+    private IActorService actorService;
+
+    public PeliculasController(IPeliculaService peliculaService, IGeneroService generoService, IActorService actorService) {
         this.peliculaService = peliculaService;
         this.generoService = generoService;
+        this.actorService = actorService;
     }
 
     @GetMapping("/pelicula")
@@ -25,6 +34,7 @@ public class PeliculasController {
         Pelicula pelicula = new Pelicula();
         model.addAttribute("pelicula", pelicula);
         model.addAttribute("generos", generoService.findAll());
+        model.addAttribute("actores", actorService.findAll());
         model.addAttribute("titulo", "Nueva Pelicula");
 
         return "pelicula";
@@ -41,7 +51,11 @@ public class PeliculasController {
     }
 
     @PostMapping("/pelicula")
-    public String guardar(Pelicula pelicula) {
+    public String guardar(Pelicula pelicula, @ModelAttribute(name = "ids") String ids) {
+        List<Long> idsProtagonistas = Arrays.stream(ids.split(","))
+                .map(Long::parseLong).toList();
+        List<Actor> protagonistas = actorService.findAllById(idsProtagonistas);
+        pelicula.setProtagonistas(protagonistas);
         peliculaService.save(pelicula);
         return "redirect:home";
     }
