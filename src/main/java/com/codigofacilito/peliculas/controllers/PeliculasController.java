@@ -25,7 +25,7 @@ public class PeliculasController {
         return "pelicula";
     }
 
-    @GetMapping("/pelicula/{id")
+    @GetMapping("/pelicula/{id}")
     public String edit(@PathVariable(name = "id") Long id, Model model) {
         Pelicula pelicula = new Pelicula();
         model.addAttribute("pelicula", pelicula);
