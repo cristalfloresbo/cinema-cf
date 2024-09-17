@@ -20,7 +20,7 @@ public class Pelicula implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date fechaEstreno;
     private Genero genero;
-    private List<Actor> protagonistas;
+//    private List<Actor> protagonistas;
 
     public Long getId() {
         return id;
@@ -54,11 +54,11 @@ public class Pelicula implements Serializable {
         this.genero = genero;
     }
 
-    public List<Actor> getProtagonistas() {
-        return protagonistas;
-    }
-
-    public void setProtagonistas(List<Actor> protagonistas) {
-        this.protagonistas = protagonistas;
-    }
+//    public List<Actor> getProtagonistas() {
+//        return protagonistas;
+//    }
+//
+//    public void setProtagonistas(List<Actor> protagonistas) {
+//        this.protagonistas = protagonistas;
+//    }
 }
