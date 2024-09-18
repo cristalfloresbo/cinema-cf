@@ -28,7 +28,7 @@ public class Pelicula implements Serializable {
     private Date fechaEstreno;
 
     @NotNull
-    @OneToOne
+    @ManyToOne
     private Genero genero;
 
     @ManyToMany
