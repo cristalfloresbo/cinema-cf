@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
-<head th:insert="layouts/head">
+<head th:insert="~{layouts/head :: head}">
 </head>
 <body>
-    <header th:insert="layouts/header"></header>
+    <header th:insert="~{layouts/header :: header}"></header>
     <div class="container">
         <form th:action="@{/pelicula}" th:object="${pelicula}" method="post" class="col-md-8 offset-md-2">
             <h2 th:text="${titulo}" class="py-4"></h2>
@@ -27,6 +27,17 @@
                     </select>
                 </div>
             </div>
+            <div class="row mb-3">
+                <label class="col-sm-2 col-form-label">Actor</label>
+                <div class="col-sm-10">
+                    <select class="form-select" th:field="*{protagonistas}" onchange="actorSelected(this)">
+                        <option th:text="'Seleccionar actor'" th:value="0"></option>
+                        <option th:each="actor: ${actores}" th:text="${actor.nombre}" th:value="${actor.id}" th:data-url="${actor.urlImagen}"></option>
+                    </select>
+                </div>
+            </div>
+            <input id="ids" name="ids" type="text" />
+            <div id="protagonistas_container" class="row"></div>
             <button type="submit" class="btn btn-primary float-end">Guardar</button>
         </form>
     </div>
