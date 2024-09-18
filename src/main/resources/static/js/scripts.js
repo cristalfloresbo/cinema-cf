@@ -8,6 +8,13 @@ function actorSelected(select) {
     option.disabled = "disabled";
     select.selectedIndex = 0;
     agregarActor(id, nombre, urlImagen);
+    let ids = $("#ids").val();
+
+    if (ids === "") {
+        $("#ids").val(id);
+    } else {
+        $("#ids").val(ids + "," + id);
+    }
 }
 
 function agregarActor(id, nombre, urlImagen) {
@@ -43,7 +50,7 @@ function eliminarActor(btn) {
 function previsualizar() {
     let reader = new FileReader();
 
-    reader.readAsDataURL(document.getElementById("imagen").files[0]);
+    reader.readAsDataURL(document.getElementById("archivo").files[0]);
 
     reader.onload = function (e) {
         let elementById = document.getElementById("vista_previa");

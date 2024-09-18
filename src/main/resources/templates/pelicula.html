@@ -42,10 +42,11 @@
             <div class="row mb-3">
                 <label class="col-sm-2 col-form-label">Imagen</label>
                 <div class="col-sm-10">
-                    <input type="file" id="imagen" name="imagen" onchange="previsualizar()"/>
+                    <input type="file" id="archivo" name="archivo" onchange="previsualizar()"/>
                     <div id="vista_previa" class="d-none"></div>
                 </div>
             </div>
+            <input id="ids" name="ids" type="hidden" th:value="${ids}" >
             <div id="protagonistas_container" class="row"></div>
             <button type="submit" class="btn btn-primary float-end">Guardar</button>
         </form>

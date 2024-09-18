@@ -4,11 +4,11 @@
 </head>
 <body>
     <header th:insert="~{layouts/header :: header}"></header>
-    <div>
+    <div class="container">
         <div class="row row-cols-1 row-cols-md-6 g-4">
             <div class="col" th:each="pelicula : ${peliculas}">
                 <div class="card">
-                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSq5wGrHWeLLsZvkGwKJeWVjAG87fu6ZOMsxGfHT7_9OhBuNHn2Gf3lntLSq9iogVDQwo8&usqp=CAU" class="card-img-top" alt="foto">
+                    <img th:src="@{${'/archivo?n='} + ${pelicula.imagen == null? '_default.jpg' : pelicula.imagen}}" class="card-img-top" alt="foto">
                     <div class="card-body">
                         <h5 class="card-title" th:text="${pelicula.nombre}"></h5>
                         <p class="card-text" th:text="${pelicula.genero.nombre}"></p>
