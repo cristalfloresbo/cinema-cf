@@ -47,10 +47,20 @@ public class PeliculasController {
 
     @GetMapping("/pelicula/{id}")
     public String edit(@PathVariable(name = "id") Long id, Model model) {
-        Pelicula pelicula = new Pelicula();
+        Pelicula pelicula = peliculaService.findById(id);
+        String ids = "";
+        for (Actor actor: pelicula.getProtagonistas()) {
+            if (ids.isEmpty()) {
+                ids = actor.getId().toString();
+            } else {
+                ids = ids + "," + actor.getId().toString();
+            }
+        }
         model.addAttribute("pelicula", pelicula);
+        model.addAttribute("ids", ids);
+        model.addAttribute("actores", actorService.findAll());
         model.addAttribute("generos", generoService.findAll());
-        model.addAttribute("titulo", "Nueva Pelicula");
+        model.addAttribute("titulo", "Editar Pelicula");
 
         return "pelicula";
     }
@@ -78,10 +88,12 @@ public class PeliculasController {
             pelicula.setImagen("_default.jpg");
         }
 
-        List<Long> idsProtagonistas = Arrays.stream(ids.split(","))
-                .map(Long::parseLong).toList();
-        List<Actor> protagonistas = actorService.findAllById(idsProtagonistas);
-        pelicula.setProtagonistas(protagonistas);
+        if (ids != null && !ids.isEmpty()) {
+            List<Long> idsProtagonistas = Arrays.stream(ids.split(","))
+                    .map(Long::parseLong).toList();
+            List<Actor> protagonistas = actorService.findAllById(idsProtagonistas);
+            pelicula.setProtagonistas(protagonistas);
+        }
         peliculaService.save(pelicula);
         return "redirect:home";
     }
@@ -96,5 +108,12 @@ public class PeliculasController {
         model.addAttribute("msj", "Catalogo actualizado a 2023");
         model.addAttribute("tipoMsj", "success");
         return "home";
+    }
+
+    @GetMapping({"/", "listado"})
+    public String listado(Model model) {
+        model.addAttribute("titulo", "Listado de Películas");
+        model.addAttribute("peliculas", peliculaService.findAll());
+        return "listado";
     }
 }
