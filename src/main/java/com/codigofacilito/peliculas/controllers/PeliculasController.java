@@ -7,6 +7,8 @@ import com.codigofacilito.peliculas.services.IArchivoService;
 import com.codigofacilito.peliculas.services.IGeneroService;
 import com.codigofacilito.peliculas.services.IPeliculaService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -17,6 +19,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.IntStream;
 
 @Controller
 public class PeliculasController {
@@ -50,7 +53,7 @@ public class PeliculasController {
     public String edit(@PathVariable(name = "id") Long id, Model model) {
         Pelicula pelicula = peliculaService.findById(id);
         String ids = "";
-        for (Actor actor: pelicula.getProtagonistas()) {
+        for (Actor actor : pelicula.getProtagonistas()) {
             if (ids.isEmpty()) {
                 ids = actor.getId().toString();
             } else {
@@ -68,8 +71,7 @@ public class PeliculasController {
 
     // BindingResult tiene almacenado las validaciones del formulario.
     @PostMapping("/pelicula")
-    public String guardar(@Valid Pelicula pelicula, BindingResult br, @ModelAttribute(name = "ids") String ids,
-                          Model model, @RequestParam("archivo") MultipartFile imagen) {
+    public String guardar(@Valid Pelicula pelicula, BindingResult br, @ModelAttribute(name = "ids") String ids, Model model, @RequestParam("archivo") MultipartFile imagen) {
 
         if (br.hasErrors()) {
             model.addAttribute("pelicula", pelicula);
@@ -90,8 +92,7 @@ public class PeliculasController {
         }
 
         if (ids != null && !ids.isEmpty()) {
-            List<Long> idsProtagonistas = Arrays.stream(ids.split(","))
-                    .map(Long::parseLong).toList();
+            List<Long> idsProtagonistas = Arrays.stream(ids.split(",")).map(Long::parseLong).toList();
             List<Actor> protagonistas = actorService.findAllById(idsProtagonistas);
             pelicula.setProtagonistas(protagonistas);
         }
@@ -104,14 +105,24 @@ public class PeliculasController {
     }
 
     @GetMapping({"/", "home", "index"})
-    public String home(Model model) {
-        model.addAttribute("peliculas", peliculaService.findAll());
-//        model.addAttribute("msj", "Catalogo actualizado a 2023");
-//        model.addAttribute("tipoMsj", "success");
+    public String home(Model model, @RequestParam(name = "pagina", required = false, defaultValue = "0") Integer pagina) {
+        PageRequest pageRequest = PageRequest.of(pagina, 12);
+        Page<Pelicula> page = peliculaService.findAll(pageRequest);
+
+        model.addAttribute("peliculas", page.getContent());
+
+        if (page.getTotalPages() > 0) {
+            List<Integer> paginas = IntStream.rangeClosed(1, page.getTotalPages()).boxed().toList();
+            // [2,3,1,3,4,... ]
+            model.addAttribute("paginas", paginas);
+        }
+
+        model.addAttribute("actual", pagina + 1);
+        model.addAttribute("titulo", "Catalogo de Películas");
         return "home";
     }
 
-    @GetMapping({"/", "listado"})
+    @GetMapping({ "listado"})
     public String listado(Model model, @RequestParam(required = false) String msj, @RequestParam(required = false) String tipoMsj) {
         model.addAttribute("titulo", "Listado de Películas");
         model.addAttribute("peliculas", peliculaService.findAll());
@@ -125,7 +136,7 @@ public class PeliculasController {
     }
 
     @GetMapping("/pelicula/{id}/delete")
-    public String eliminar(@PathVariable(name = "id") Long id, Model model, RedirectAttributes redirectAttributes) {
+    public String eliminar(@PathVariable(name = "id") Long id, RedirectAttributes redirectAttributes) {
         peliculaService.delete(id);
         redirectAttributes.addAttribute("msj", "La pelicula fue eliminada correctamente");
         redirectAttributes.addAttribute("tipoMsj", "success");

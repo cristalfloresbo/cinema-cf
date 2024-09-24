@@ -40,6 +40,7 @@ public class ArchivoService implements IArchivoService {
         Resource resource = null;
         try {
             resource = new UrlResource(resolvePath(archivo).toUri());
+            //        resource = new ClassPathResource("archivo" + archivo);
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
